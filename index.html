@@ -59,8 +59,8 @@ body
         
         <br><br>
         
-        <label>Valor Promedio IDs</label>
-        <input id="promedioIDs" type="text"> 
+        <label>Valor Promedio DNIs</label>
+        <input id="promedioDNIs" type="text"> 
         <button onclick="calcularPromedio()">CALCULAR</button>
         
         <br><br>
@@ -108,13 +108,13 @@ body
             <input id="id" type="text"> 
             <br> <br>
             <label>DNI</label>
-            <input id="dni" type="text"> 
+            <input id="dni" type="text" onkeypress="return (event.charCode >= 48 && event.charCode <= 57)" maxlength="10"> 
             <br> <br>
             <label>Apellido</label>
-            <input id="apellido" type="text">
+            <input id="apellido" type="text" onkeypress="return (event.charCode >= 65 && event.charCode <= 90 || event.charCode >= 97 && event.charCode <= 122)" maxlength="20">
             <br> <br>
             <label>Nombre</label>
-            <input id="nombre" type="text">
+            <input id="nombre" type="text" onkeypress="return (event.charCode >= 65 && event.charCode <= 90 || event.charCode >= 97 && event.charCode <= 122)" maxlength="20">
             <br> <br>
             <label>Tipo</label>
             <select id = "tipoPersona" onchange="validarTipoUsuario()">
@@ -124,16 +124,16 @@ body
             <br> <br>
             <div class="datosDeAlumnos">
                 <label>Curso letra</label>
-                <input id="cursoLetra" type="text">
+                <input id="cursoLetra" type="text" maxlength="20" onkeypress="return (event.charCode >= 65 && event.charCode <= 90 || event.charCode >= 97 && event.charCode <= 122)">
                 <br> <br>
                 <label>Curso numero</label>
-                <input id="cursoNumero" type="text">
+                <input id="cursoNumero" type="text" onkeypress="return (event.charCode >= 48 && event.charCode <= 57)" maxlength="5">
             </div>
             <br> <br>
             <div class="datosDeDocentes">
-                <label>Materia <input id="materia" type="text"></label>
+                <label>Materia <input id="materia" type="text" onkeypress="return (event.charCode >= 65 && event.charCode <= 90 || event.charCode >= 97 && event.charCode <= 122)" maxlength="20"></label>
                 <br> <br>
-                <label>Anio <input id="anio" type="text"></label>
+                <label>Anio <input id="anio" type="text" onkeypress="return (event.charCode >= 48 && event.charCode <= 57)" maxlength="5"></label>
             </div>
             <br> <br>
 
@@ -228,7 +228,7 @@ class Persona
 
     toString()
     {
-        return "id: " + this.id + ", apellido: " + this.apellido + ", nombre: " + this.nombre + "," + "dni: " + this.dni;
+        return "id: " + this.id + ", apellido: " + this.apellido + ", nombre: " + this.nombre + "," + "dni: " + this.dni + ",";
     }
 }
 
@@ -243,7 +243,7 @@ class Docente extends Persona
 
     toString()
     {
-        return "materia: " + this.materia + ", anio: " + this.anio + ",";
+        return super.toString() + "materia: " + this.materia + ", anio: " + this.anio;
     }
 }
 
@@ -258,7 +258,7 @@ class Alumno extends Persona
 
     toString()
     {
-        return "cursoLetra: " + this.cursoLetra + ", cursoNumero: " + this.cursoNumero + ",";
+        return super.toString() + "cursoLetra: " + this.cursoLetra + ", cursoNumero: " + this.cursoNumero;
     }
 }
 
@@ -270,7 +270,7 @@ function generadorArrayV(json)
         if(objeto.id && objeto.apellido && objeto.nombre)
         {
             if(objeto.materia && objeto.anio)
-            {
+            {promedioDNIs
                 arrayDatos.push(new Docente(objeto.id,objeto.apellido, objeto.nombre, objeto.dni, objeto.materia, objeto.anio));
             }
             else
@@ -345,7 +345,7 @@ function cargarTabla(miArray)
 
         cursoNumero.appendChild(document.createTextNode(element.cursoNumero || "N/C"));
         fila.appendChild(cursoNumero);
-
+    
         document.getElementById("cuerpo").appendChild(fila);
         
     });
@@ -401,37 +401,15 @@ function traerDatosTabla()
             break;
     }
 
+
     return nuevoArray;
 }
 
 function seleccionarFiltrado ()
 {
-   /*  opcionSeleccionada = selection.options[selection.selectedIndex].value;
-
-    switch (opcionSeleccionada) {
-        case 'Alumnos':
-            nuevoArray = arrayDeObjetos.filter((a)=>{ 
-                return a.constructor.name == "Alumno" ? a : false;
-            });
-            cargarTabla(nuevoArray);
-            break;
-        case 'Docentes':
-            nuevoArray = arrayDeObjetos.filter((a)=>{ 
-                return a.constructor.name == "Docente" ? a : false;
-            });
-            cargarTabla(nuevoArray);
-            break;
-        default:
-            nuevoArray = arrayDeObjetos;
-            cargarTabla(nuevoArray);
-            break;
-    }
-    document.getElementById("promedioIDs").value = null;
-    return nuevoArray; 
- */
     nuevoArray = traerDatosTabla(arrayDeObjetos);
     cargarTabla(nuevoArray);
-    document.getElementById("promedioIDs").value = null;
+    document.getElementById("promedioDNIs").value = null;
     return nuevoArray; 
 }
 
@@ -440,12 +418,12 @@ function calcularPromedio ()
 {
     miArray = traerDatosTabla();
 
-    var sumatoria = Object.values(miArray).reduce(function(acumulador, {id}){
-    return acumulador + parseInt(id);
+    var sumatoria = Object.values(miArray).reduce(function(acumulador, {dni}){
+    return acumulador + parseInt(dni);
     }, 0); 
 
     promedio = sumatoria / miArray.length;
-    document.getElementById("promedioIDs").value = promedio;
+    document.getElementById("promedioDNIs").value = promedio;
 }
 /* ORDENO POR CADA BOTON */
 function ordenId()
@@ -662,28 +640,10 @@ function crearObjeto()
 
 function agregarRegistro()
 {
-    /* id = (document.getElementById("id")).value;
-    apellido = (document.getElementById("apellido")).value;
-    nombre = (document.getElementById("nombre")).value;
-    dni = (document.getElementById("dni")).value;
-    cursoLetra = (document.getElementById("cursoLetra")).value;
-    cursoNumero = (document.getElementById("cursoNumero")).value;
-    materia = (document.getElementById("materia")).value;
-    anio = (document.getElementById("anio")).value;
-
-    if(cuil == "" && sueldo == "")
-    {
-        arrayDeObjetos.push(new Cliente(id,apellido, nombre, edad, sexo));
-    }
-    else
-    {
-        arrayDeObjetos.push(new Empleado(id, apellido ,nombre, cuil, sueldo));
-    }
- */
     miObjeto = crearObjeto();
     arrayDeObjetos.push(miObjeto);
     cargarTabla(arrayDeObjetos);
-
+    console.log(miObjeto.toString());
     volverAtras();
 }
 
@@ -744,106 +704,56 @@ function modificarRegistro()
 {
     unObjeto = crearObjeto();
 
-    if(!Number.isNaN(parseInt(unObjeto.dni)))
-    {
-        if(unObjeto.constructor.name == "Alumno")
+    arrayDeObjetos.map(e=>{
+        if(e.id == unObjeto.id)
         {
-            if(!Number.isNaN(parseInt(unObjeto.cursoNumero)))
-            {
-                arrayDeObjetos.map(e=>{
-                    if(e.id == unObjeto.id)
-                    {
-                        e.apellido = unObjeto.apellido;
-                        e.nombre = unObjeto.nombre;
-                        e.dni = unObjeto.dni;
-            
-                        if(e.constructor.name == "Alumno")
-                        {
-                            e.cursoLetra = unObjeto.cursoLetra;
-                            e.cursoNumero = unObjeto.cursoNumero;
-                        }
-                        else
-                        {
-                            e.materia = unObjeto.materia;
-                            e.anio = unObjeto.anio;
-                        }
-                    }
-                });
-                
-                volverAtras();
-                cargarTabla(arrayDeObjetos);
-            }
-            else
-            {
-                alert("NO ES UN ANIO VALIDO");
-            }
-        }
-        else
-        {
-            if(!Number.isNaN(parseInt(unObjeto.anio)))
-            {
-                arrayDeObjetos.map(e=>{
-                    if(e.id == unObjeto.id)
-                    {
-                        e.apellido = unObjeto.apellido;
-                        e.nombre = unObjeto.nombre;
-                        e.dni = unObjeto.dni;
-            
-                        if(e.constructor.name == "Alumno")
-                        {
-                            e.cursoLetra = unObjeto.cursoLetra;
-                            e.cursoNumero = unObjeto.cursoNumero;
-                        }
-                        else
-                        {
-                            e.materia = unObjeto.materia;
-                            e.anio = unObjeto.anio;
-                        }
-                    }
-                });
-                
-                volverAtras();
-                cargarTabla(arrayDeObjetos);
-            }
-            else
-            {
-                alert("NO ES UN ANIO VALIDO");
-            }
-        }
-    
-    }
-    else
-    {
-        alert("NO ES UN DNI VALIDO");
-    }
+            e.apellido = unObjeto.apellido;
+            e.nombre = unObjeto.nombre;
+            e.dni = unObjeto.dni;
 
-    //arrayDeObjetos = arrayDeObjetos.filter((item) => item.id != id);
+            if(e.constructor.name == "Alumno")
+            {
+                e.cursoLetra = unObjeto.cursoLetra;
+                e.cursoNumero = unObjeto.cursoNumero;
+            }
+            else
+            {
+                e.materia = unObjeto.materia;
+                e.anio = unObjeto.anio;
+            }
+        }
+    });
+    
+    volverAtras();
+    cargarTabla(arrayDeObjetos);
 }
 
 /* Valido los checkbox */
-var unChecbox = document.getElementById("seccion-id");
-unChecbox.addEventListener("change", verificarCheckBox,false);
 
-var unChecbox = document.getElementById("seccion-apellido");
-unChecbox.addEventListener("change", verificarCheckBox,false);
+    var unChecbox = document.getElementById("seccion-id");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
+    
+    var unChecbox = document.getElementById("seccion-apellido");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
+    
+    var unChecbox = document.getElementById("seccion-nombre");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
+    
+    var unChecbox = document.getElementById("seccion-dni");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
+    
+    var unChecbox = document.getElementById("seccion-materia");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
+    
+    var unChecbox = document.getElementById("seccion-anio");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
+    
+    var unChecbox = document.getElementById("seccion-cursoLetra");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
+    
+    var unChecbox = document.getElementById("seccion-cursoNumero");
+    unChecbox.addEventListener("change", verificarCheckBox,false);
 
-var unChecbox = document.getElementById("seccion-nombre");
-unChecbox.addEventListener("change", verificarCheckBox,false);
-
-var unChecbox = document.getElementById("seccion-dni");
-unChecbox.addEventListener("change", verificarCheckBox,false);
-
-var unChecbox = document.getElementById("seccion-materia");
-unChecbox.addEventListener("change", verificarCheckBox,false);
-
-var unChecbox = document.getElementById("seccion-anio");
-unChecbox.addEventListener("change", verificarCheckBox,false);
-
-var unChecbox = document.getElementById("seccion-cursoLetra");
-unChecbox.addEventListener("change", verificarCheckBox,false);
-
-var unChecbox = document.getElementById("seccion-cursoNumero");
-unChecbox.addEventListener("change", verificarCheckBox,false);
 
 /* Valido el filtrado de datos */
 var selection = document.getElementById("st-filtrado");
@@ -879,7 +789,6 @@ seleccionTr.addEventListener("dblclick", function(item) {
     document.querySelector(".btn-agregar").disabled =true;
 
     asignarDatosAlForm(row_value);
-    console.log(arrayDeObjetos);
     }); 
 </script>
 
